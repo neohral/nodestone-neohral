@@ -10,6 +10,8 @@ import { FreeCompany } from "./freecompany/freecompany";
 import { FCMembers } from "./freecompany/members";
 import { CharacterSearch } from "./search/character-search";
 import { FreeCompanySearch } from "./search/freecompany-search";
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 const app = express();
 
@@ -129,7 +131,7 @@ if(!!keyPath&&!!certPath)
   const certificate = fs.readFileSync(certPath);
   const credentials = {key: privateKey, cert: certificate};
   const httpsServer = https.createServer(credentials, app);
-  server = httpsServer.listen(port, () => console.log(`Listening at http://localhost:${port}`));
+  server = httpsServer.listen(port, () => console.log(`Listening at https://localhost:${port}`));
 }else{
   server = app.listen(port, () => {
     logger.info(`Listening at http://localhost:${port}`);
