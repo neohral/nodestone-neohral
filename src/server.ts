@@ -1,6 +1,8 @@
 import express from "express";
 import logger from './logger/logger';
 import pinoHttp from 'pino-http';
+import * as fs from 'fs';
+import * as https from 'https';
 import { Character } from "./profile/character";
 import { Achievements } from "./profile/achievements";
 import { ClassJob } from "./profile/classjob";
@@ -116,8 +118,24 @@ app.get("/FreeCompany/:fcId", async (req, res) => {
   }
 });
 
+let server;
 const port = process.env.PORT || 8080;
-const server = app.listen(port, () => {
-  logger.info(`Listening at http://localhost:${port}`);
-});
-server.on("error", console.error);
+const keyPath = process.env.HTTPS_KEY;
+const certPath = process.env.HTTPS_CERT;
+
+if(!!keyPath&&!!certPath)
+{
+  const privateKey = fs.readFileSync(keyPath);
+  const certificate = fs.readFileSync(certPath);
+  const credentials = {key: privateKey, cert: certificate};
+  const httpsServer = https.createServer(credentials, app);
+  server = httpsServer.listen(port, () => console.log(`Listening at http://localhost:${port}`));
+}else{
+  server = app.listen(port, () => {
+    logger.info(`Listening at http://localhost:${port}`);
+  });
+  server.on("error", console.error);
+}
+
+
+
